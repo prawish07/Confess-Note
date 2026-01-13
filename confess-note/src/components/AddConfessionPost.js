@@ -1,8 +1,10 @@
 import React,{useState} from 'react'
 import "../assets/css/AddConfessionPost.css"
 import {FaLock} from 'react-icons/fa'
-import { database as db,set,ref } from '../config/firebase'
+import { database as db,set,ref, onValue, database } from '../config/firebase'
 import { v4 as uuidv4 } from 'uuid';
+import { ToastContainer, toast } from 'react-toast'
+
 const AddConfessionPost = () => {
   const[text,setText]=useState("")
   const addConfession=()=>{
@@ -13,12 +15,31 @@ const AddConfessionPost = () => {
    
   }).then((err)=>{
     if(!err){
-      console.log("Succesfully added")
+      toast.success("Succesfully added")
       setText("")
+      onValue(ref(db,"confessions"),(snapshot)=>{
+        let _data=snapshot.val()
+          for (let key in _data) {
+    // keep Firebase field: createdAt
+     let expiryTime = new Date (_data[key].createdAt);
+      // ✅ renamed variable
+    //  console.log(_data[key].note)
+    // add 1 day (24 hours)
+    expiryTime.setDate(expiryTime.getDate() + 1);
+     
+    if (new Date() >= expiryTime) {
+      set(ref(db, "confessions/" + key), null);
+      console.log("exceed 24hrs need to be deleted");
     }
-    else console.log("Not added")
+  }
+      })
+    }
+    else toast.error("Not added")
 
   })
+    }
+    else {
+      toast.error("Please add some note")
     }
   }
   return (
@@ -39,6 +60,7 @@ const AddConfessionPost = () => {
             fontSize:"8px",
             marginLeft:"5px"
         }}>Confess Note will remain for 24 hrs</small>
+        <ToastContainer delay={2500}/>
     </center>
   )
 }

@@ -6,11 +6,17 @@
     filter: contrast(64%);
    
 }
-.navbar-title{
+.navbar-title,
+.navbar-title>a
+{
     font-weight: bold;
     font-size: 24px;
      color: white;
+     text-decoration: none;
 }
-.navbar-routes{
-    color:#ccc
+.navbar-routes,.navbar-routes>a
+{
+    color:#ccc;
+    text-decoration: none;
+
 }
